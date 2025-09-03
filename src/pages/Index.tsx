@@ -2,12 +2,18 @@ import { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Dashboard } from "@/components/dashboard/Dashboard";
+import { SyndicDashboard } from "@/components/syndic/SyndicDashboard";
+import { CommunicationCenter } from "@/components/syndic/CommunicationCenter";
+import { TicketManagement } from "@/components/syndic/TicketManagement";
+import { FinancialManagement } from "@/components/syndic/FinancialManagement";
+import { ServiceManagement } from "@/components/syndic/ServiceManagement";
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
 
   const renderContent = () => {
     switch (activeSection) {
+      // Área do Morador
       case "dashboard":
         return <Dashboard />;
       case "communications":
@@ -24,6 +30,19 @@ const Index = () => {
         return <div className="p-6"><h2 className="text-2xl font-bold">Gestão de Moradores</h2><p className="text-muted-foreground mt-2">Cadastro e gestão de moradores em desenvolvimento...</p></div>;
       case "building":
         return <div className="p-6"><h2 className="text-2xl font-bold">Informações do Edifício</h2><p className="text-muted-foreground mt-2">Dados e configurações do condomínio em desenvolvimento...</p></div>;
+      
+      // Área do Síndico
+      case "syndic-dashboard":
+        return <SyndicDashboard />;
+      case "syndic-communication":
+        return <CommunicationCenter />;
+      case "syndic-tickets":
+        return <TicketManagement />;
+      case "syndic-financial":
+        return <FinancialManagement />;
+      case "syndic-services":
+        return <ServiceManagement />;
+      
       default:
         return <Dashboard />;
     }

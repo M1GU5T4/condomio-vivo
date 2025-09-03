@@ -8,7 +8,12 @@ import {
   Users,
   Building2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Home,
+  Megaphone,
+  Clipboard,
+  DollarSign,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,6 +33,14 @@ const navigationItems = [
   { id: "analytics", label: "Relatórios", icon: BarChart3 },
   { id: "residents", label: "Moradores", icon: Users },
   { id: "building", label: "Edifício", icon: Building2 },
+];
+
+const syndicNavigationItems = [
+  { id: "syndic-dashboard", label: "Painel de Controle", icon: Home },
+  { id: "syndic-communication", label: "Central de Anúncios", icon: Megaphone },
+  { id: "syndic-tickets", label: "Gestão de Chamados", icon: Clipboard },
+  { id: "syndic-financial", label: "Gestão Financeira", icon: DollarSign },
+  { id: "syndic-services", label: "Gestão de Serviços", icon: Settings },
 ];
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
@@ -50,27 +63,60 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
           {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </Button>
 
-        <nav className="space-y-2">
-          {navigationItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeSection === item.id;
-            
-            return (
-              <Button
-                key={item.id}
-                variant={isActive ? "default" : "ghost"}
-                className={cn(
-                  "w-full justify-start transition-all duration-200",
-                  isCollapsed ? "px-2" : "px-4",
-                  isActive && "bg-gradient-primary text-primary-foreground shadow-md"
-                )}
-                onClick={() => onSectionChange(item.id)}
-              >
-                <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
-                {!isCollapsed && <span>{item.label}</span>}
-              </Button>
-            );
-          })}
+        <nav className="space-y-4">
+          {/* Área do Morador */}
+          <div>
+            {!isCollapsed && <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Área do Morador</h3>}
+            <div className="space-y-2">
+              {navigationItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.id;
+                
+                return (
+                  <Button
+                    key={item.id}
+                    variant={isActive ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start transition-all duration-200",
+                      isCollapsed ? "px-2" : "px-4",
+                      isActive && "bg-gradient-primary text-primary-foreground shadow-md"
+                    )}
+                    onClick={() => onSectionChange(item.id)}
+                  >
+                    <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Área do Síndico */}
+          <div>
+            {!isCollapsed && <h3 className="text-xs font-semibold text-accent-foreground uppercase tracking-wider mb-2">Área do Síndico</h3>}
+            <div className="space-y-2">
+              {syndicNavigationItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = activeSection === item.id;
+                
+                return (
+                  <Button
+                    key={item.id}
+                    variant={isActive ? "default" : "ghost"}
+                    className={cn(
+                      "w-full justify-start transition-all duration-200",
+                      isCollapsed ? "px-2" : "px-4",
+                      isActive && "bg-success text-success-foreground shadow-md"
+                    )}
+                    onClick={() => onSectionChange(item.id)}
+                  >
+                    <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                    {!isCollapsed && <span>{item.label}</span>}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
         </nav>
       </div>
     </aside>
