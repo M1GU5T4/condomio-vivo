@@ -1,4 +1,4 @@
-import { Bell, Building, Menu, Settings, User } from "lucide-react";
+import { Bell, Building, Menu, Settings, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,8 +8,39 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export function Header() {
+  const { profile, signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Erro ao sair",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logout realizado",
+        description: "Até a próxima!",
+      });
+    }
+  };
+
+  const getRoleLabel = (role: string) => {
+    const labels = {
+      tenant: "Locatário",
+      owner: "Proprietário", 
+      syndic: "Síndico",
+      admin: "Administrador"
+    };
+    return labels[role as keyof typeof labels] || role;
+  };
+
   return (
     <header className="bg-card border-b border-border shadow-sm">
       <div className="flex items-center justify-between px-6 py-4">
@@ -18,11 +49,16 @@ export function Header() {
             <Building className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                CondoManager
+                SaaS Condomínio
               </h1>
-              <p className="text-xs text-muted-foreground">Edifício Sunset Towers</p>
+              <p className="text-xs text-muted-foreground">Sistema de Gestão Condominial</p>
             </div>
           </div>
+          {profile && (
+            <Badge variant="secondary">
+              {getRoleLabel(profile.role)}
+            </Badge>
+          )}
         </div>
 
         <div className="flex items-center space-x-4">
@@ -39,11 +75,15 @@ export function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center space-x-2">
                 <div className="h-8 w-8 rounded-full bg-gradient-primary flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary-foreground" />
+                  <span className="text-sm font-semibold text-primary-foreground">
+                    {profile?.full_name?.charAt(0) || "U"}
+                  </span>
                 </div>
                 <div className="text-left hidden md:block">
-                  <p className="text-sm font-medium">Maria Silva</p>
-                  <p className="text-xs text-muted-foreground">Apt. 1201</p>
+                  <p className="text-sm font-medium">{profile?.full_name || "Usuário"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {profile?.apartment_number ? `Apt. ${profile.apartment_number}` : "Sem apartamento"}
+                  </p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -57,7 +97,8 @@ export function Header() {
                 Configurações
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive" onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
                 Sair
               </DropdownMenuItem>
             </DropdownMenuContent>

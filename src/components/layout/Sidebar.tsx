@@ -18,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { RoleBasedAccess } from "@/components/RoleBasedAccess";
 
 interface SidebarProps {
   activeSection: string;
@@ -45,6 +47,7 @@ const syndicNavigationItems = [
 
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { profile } = useAuth();
 
   return (
     <aside 
@@ -64,59 +67,63 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
         </Button>
 
         <nav className="space-y-4">
-          {/* Área do Morador */}
-          <div>
-            {!isCollapsed && <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Área do Morador</h3>}
-            <div className="space-y-2">
-              {navigationItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeSection === item.id;
-                
-                return (
-                  <Button
-                    key={item.id}
-                    variant={isActive ? "default" : "ghost"}
-                    className={cn(
-                      "w-full justify-start transition-all duration-200",
-                      isCollapsed ? "px-2" : "px-4",
-                      isActive && "bg-gradient-primary text-primary-foreground shadow-md"
-                    )}
-                    onClick={() => onSectionChange(item.id)}
-                  >
-                    <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
-                    {!isCollapsed && <span>{item.label}</span>}
-                  </Button>
-                );
-              })}
+          {/* Área do Morador - Visível para todos */}
+          <RoleBasedAccess allowedRoles={['tenant', 'owner', 'syndic', 'admin']}>
+            <div>
+              {!isCollapsed && <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Área do Morador</h3>}
+              <div className="space-y-2">
+                {navigationItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
+                  
+                  return (
+                    <Button
+                      key={item.id}
+                      variant={isActive ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start transition-all duration-200",
+                        isCollapsed ? "px-2" : "px-4",
+                        isActive && "bg-gradient-primary text-primary-foreground shadow-md"
+                      )}
+                      onClick={() => onSectionChange(item.id)}
+                    >
+                      <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </RoleBasedAccess>
 
-          {/* Área do Síndico */}
-          <div>
-            {!isCollapsed && <h3 className="text-xs font-semibold text-accent-foreground uppercase tracking-wider mb-2">Área do Síndico</h3>}
-            <div className="space-y-2">
-              {syndicNavigationItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeSection === item.id;
-                
-                return (
-                  <Button
-                    key={item.id}
-                    variant={isActive ? "default" : "ghost"}
-                    className={cn(
-                      "w-full justify-start transition-all duration-200",
-                      isCollapsed ? "px-2" : "px-4",
-                      isActive && "bg-success text-success-foreground shadow-md"
-                    )}
-                    onClick={() => onSectionChange(item.id)}
-                  >
-                    <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
-                    {!isCollapsed && <span>{item.label}</span>}
-                  </Button>
-                );
-              })}
+          {/* Área do Síndico - Visível apenas para síndicos e admins */}
+          <RoleBasedAccess allowedRoles={['syndic', 'admin']}>
+            <div>
+              {!isCollapsed && <h3 className="text-xs font-semibold text-accent-foreground uppercase tracking-wider mb-2">Área do Síndico</h3>}
+              <div className="space-y-2">
+                {syndicNavigationItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
+                  
+                  return (
+                    <Button
+                      key={item.id}
+                      variant={isActive ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start transition-all duration-200",
+                        isCollapsed ? "px-2" : "px-4",
+                        isActive && "bg-success text-success-foreground shadow-md"
+                      )}
+                      onClick={() => onSectionChange(item.id)}
+                    >
+                      <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </RoleBasedAccess>
         </nav>
       </div>
     </aside>
