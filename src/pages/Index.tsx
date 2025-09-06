@@ -7,6 +7,9 @@ import { CommunicationCenter } from "@/components/syndic/CommunicationCenter";
 import { TicketManagement } from "@/components/syndic/TicketManagement";
 import { FinancialManagement } from "@/components/syndic/FinancialManagement";
 import { ServiceManagement } from "@/components/syndic/ServiceManagement";
+import { CommunicationPage } from "@/components/communication/CommunicationPage";
+import { ServicesPage } from "@/components/services/ServicesPage";
+import DocumentsPage from '@/components/documents/DocumentsPage';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -17,11 +20,11 @@ const Index = () => {
       case "dashboard":
         return <Dashboard />;
       case "communications":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Módulo de Comunicação</h2><p className="text-muted-foreground mt-2">Sistema de chamados, enquetes e comunicados em desenvolvimento...</p></div>;
+        return <CommunicationPage />;
       case "services":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Gestão de Serviços</h2><p className="text-muted-foreground mt-2">Agendamentos e prestadores de serviço em desenvolvimento...</p></div>;
+        return <ServicesPage />;
       case "documents":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Central de Documentos</h2><p className="text-muted-foreground mt-2">Repositório de documentos e regulamentos em desenvolvimento...</p></div>;
+        return <DocumentsPage />;
       case "bookings":
         return <div className="p-6"><h2 className="text-2xl font-bold">Reservas</h2><p className="text-muted-foreground mt-2">Sistema de reserva de áreas comuns em desenvolvimento...</p></div>;
       case "analytics":
