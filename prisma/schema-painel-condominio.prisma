@@ -1,0 +1,256 @@
+// Modelos de Dados para o Módulo Painel do Condomínio
+// Este arquivo contém os schemas Prisma para todas as funcionalidades
+
+// Enum para prioridade de posts
+enum PostPriority {
+  NORMAL
+  URGENTE
+  CRITICA
+}
+
+// Enum para audiência de posts
+enum PostAudienceType {
+  TODOS
+  BLOCO_ESPECIFICO
+  UNIDADE_ESPECIFICA
+}
+
+// Enum para categoria de documentos
+enum DocumentCategory {
+  REGIMENTO_INTERNO
+  ATAS
+  FINANCEIRO
+  JURIDICO
+  MANUTENCAO
+  OUTROS
+}
+
+// Enum para categoria de classificados
+enum ClassifiedCategory {
+  VENDA
+  SERVICO
+  DOACAO
+  TROCA
+}
+
+// Enum para status de classificados
+enum ClassifiedStatus {
+  ATIVO
+  VENDIDO
+  INATIVO
+}
+
+// Enum para status de achados e perdidos
+enum LostFoundStatus {
+  PERDIDO
+  ENCONTRADO
+  DEVOLVIDO
+}
+
+// Modelo principal para posts do mural
+model Post {
+  id          String      @id @default(cuid())
+  title       String
+  content     String      @db.Text
+  priority    PostPriority @default(NORMAL)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  publishedAt DateTime?
+  expiresAt   DateTime?
+  isActive    Boolean     @default(true)
+  
+  // Relacionamentos
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [id])
+  condominiumId String
+  condominium   Condominium @relation(fields: [condominiumId], references: [id])
+  
+  // Audiência e visualizações
+  audiences PostAudience[]
+  views     PostView[]
+  
+  @@map("posts")
+}
+
+// Modelo para definir audiência específica de posts
+model PostAudience {
+  id     String            @id @default(cuid())
+  type   PostAudienceType
+  
+  // Campos opcionais para segmentação
+  blockNumber String?
+  unitId      String?
+  
+  // Relacionamentos
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  unit   Unit?  @relation(fields: [unitId], references: [id])
+  
+  @@map("post_audiences")
+}
+
+// Modelo para rastrear visualizações de posts
+model PostView {
+  id       String   @id @default(cuid())
+  viewedAt DateTime @default(now())
+  
+  // Relacionamentos
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+  
+  @@unique([postId, userId])
+  @@map("post_views")
+}
+
+// Modelo para biblioteca de documentos
+model Document {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  fileName    String
+  filePath    String
+  fileSize    Int
+  mimeType    String
+  category    DocumentCategory
+  isPublic    Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  // Relacionamentos
+  uploadedById  String
+  uploadedBy    User        @relation(fields: [uploadedById], references: [id])
+  condominiumId String
+  condominium   Condominium @relation(fields: [condominiumId], references: [id])
+  
+  @@map("documents")
+}
+
+// Modelo para eventos do condomínio
+model Event {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  location    String?
+  imageUrl    String?
+  maxAttendees Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relacionamentos
+  organizerId   String
+  organizer     User        @relation(fields: [organizerId], references: [id])
+  condominiumId String
+  condominium   Condominium @relation(fields: [condominiumId], references: [id])
+  
+  // RSVPs
+  rsvps EventRSVP[]
+  
+  @@map("events")
+}
+
+// Modelo para confirmações de presença em eventos
+model EventRSVP {
+  id         String   @id @default(cuid())
+  isAttending Boolean
+  guestCount Int      @default(1)
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relacionamentos
+  eventId String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  
+  @@unique([eventId, userId])
+  @@map("event_rsvps")
+}
+
+// Modelo para classificados internos
+model ClassifiedAd {
+  id          String             @id @default(cuid())
+  title       String
+  description String             @db.Text
+  price       Decimal?           @db.Decimal(10, 2)
+  category    ClassifiedCategory
+  status      ClassifiedStatus   @default(ATIVO)
+  images      String[]           // Array de URLs das imagens
+  contactInfo String?            // Informações de contato opcionais
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  expiresAt   DateTime?
+  
+  // Relacionamentos
+  authorId      String
+  author        User        @relation(fields: [authorId], references: [id])
+  condominiumId String
+  condominium   Condominium @relation(fields: [condominiumId], references: [id])
+  
+  @@map("classified_ads")
+}
+
+// Modelo para achados e perdidos
+model LostAndFoundItem {
+  id          String          @id @default(cuid())
+  title       String
+  description String          @db.Text
+  status      LostFoundStatus
+  foundLocation String?
+  imageUrl    String?
+  contactInfo String?
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  resolvedAt  DateTime?
+  
+  // Relacionamentos
+  reporterId    String
+  reporter      User        @relation(fields: [reporterId], references: [id])
+  condominiumId String
+  condominium   Condominium @relation(fields: [condominiumId], references: [id])
+  
+  @@map("lost_and_found_items")
+}
+
+// Extensões necessárias aos modelos existentes (para referência)
+// Estas relações devem ser adicionadas aos modelos User e Condominium existentes:
+
+/*
+model User {
+  // ... campos existentes ...
+  
+  // Novas relações para o Painel do Condomínio
+  posts            Post[]
+  postViews        PostView[]
+  documents        Document[]
+  organizedEvents  Event[]
+  eventRSVPs       EventRSVP[]
+  classifiedAds    ClassifiedAd[]
+  lostFoundItems   LostAndFoundItem[]
+}
+
+model Condominium {
+  // ... campos existentes ...
+  
+  // Novas relações para o Painel do Condomínio
+  posts            Post[]
+  documents        Document[]
+  events           Event[]
+  classifiedAds    ClassifiedAd[]
+  lostFoundItems   LostAndFoundItem[]
+}
+
+model Unit {
+  // ... campos existentes ...
+  
+  // Nova relação para audiência específica
+  postAudiences PostAudience[]
+}
+*/

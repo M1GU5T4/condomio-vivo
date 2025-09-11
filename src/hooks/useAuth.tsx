@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useTestAuth } from "./useTestAuth";
 
 interface Profile {
   id: string;
@@ -19,9 +20,9 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, userData: { full_name: string; role: string; apartment_number?: string }) => Promise<{ error: any }>;
-  signOut: () => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, userData: { full_name: string; role: string; apartment_number?: string }) => Promise<{ error: Error | null }>;
+  signOut: () => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -142,5 +143,21 @@ export function useAuth() {
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
+  
+  // Durante o desenvolvimento, use o perfil de teste se disponível
+  try {
+    const testAuth = useTestAuth();
+    if (testAuth?.profile) {
+      return {
+        ...context,
+        profile: testAuth.profile,
+        user: context.user || { id: testAuth.profile.user_id } as User,
+        session: context.session || { user: { id: testAuth.profile.user_id } } as Session
+      };
+    }
+  } catch {
+    // TestAuthProvider não está disponível, use o contexto normal
+  }
+  
   return context;
 }

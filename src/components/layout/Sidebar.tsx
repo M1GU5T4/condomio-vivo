@@ -45,6 +45,12 @@ const syndicNavigationItems = [
   { id: "syndic-services", label: "Gestão de Serviços", icon: Settings },
 ];
 
+const adminNavigationItems = [
+  { id: "admin-residents", label: "Gestão de Moradores", icon: Users },
+  { id: "admin-building", label: "Gestão do Edifício", icon: Building2 },
+  { id: "admin-system", label: "Configurações", icon: Settings },
+];
+
 export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { profile } = useAuth();
@@ -113,6 +119,35 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
                         "w-full justify-start transition-all duration-200",
                         isCollapsed ? "px-2" : "px-4",
                         isActive && "bg-success text-success-foreground shadow-md"
+                      )}
+                      onClick={() => onSectionChange(item.id)}
+                    >
+                      <Icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                      {!isCollapsed && <span>{item.label}</span>}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+          </RoleBasedAccess>
+
+          {/* Área do Administrador - Visível apenas para admins */}
+          <RoleBasedAccess allowedRoles={['admin']}>
+            <div>
+              {!isCollapsed && <h3 className="text-xs font-semibold text-destructive-foreground uppercase tracking-wider mb-2">Área do Administrador</h3>}
+              <div className="space-y-2">
+                {adminNavigationItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
+                  
+                  return (
+                    <Button
+                      key={item.id}
+                      variant={isActive ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start transition-all duration-200",
+                        isCollapsed ? "px-2" : "px-4",
+                        isActive && "bg-destructive text-destructive-foreground shadow-md"
                       )}
                       onClick={() => onSectionChange(item.id)}
                     >

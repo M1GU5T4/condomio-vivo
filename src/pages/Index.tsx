@@ -10,6 +10,11 @@ import { ServiceManagement } from "@/components/syndic/ServiceManagement";
 import { CommunicationPage } from "@/components/communication/CommunicationPage";
 import { ServicesPage } from "@/components/services/ServicesPage";
 import DocumentsPage from '@/components/documents/DocumentsPage';
+import { ResidentsPage } from '@/components/residents/ResidentsPage';
+import { AdminResidentsPage } from '@/components/admin/AdminResidentsPage';
+import ReservationsPage from '@/components/reservations/ReservationsPage';
+import { BuildingPage } from '@/components/building/BuildingPage';
+import ReportsPage from '@/components/reports/ReportsPage';
 
 const Index = () => {
   const [activeSection, setActiveSection] = useState("dashboard");
@@ -26,13 +31,13 @@ const Index = () => {
       case "documents":
         return <DocumentsPage />;
       case "bookings":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Reservas</h2><p className="text-muted-foreground mt-2">Sistema de reserva de áreas comuns em desenvolvimento...</p></div>;
+        return <ReservationsPage />;
       case "analytics":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Relatórios e Análises</h2><p className="text-muted-foreground mt-2">Dashboard de consumo e análises em desenvolvimento...</p></div>;
+        return <ReportsPage />;
       case "residents":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Gestão de Moradores</h2><p className="text-muted-foreground mt-2">Cadastro e gestão de moradores em desenvolvimento...</p></div>;
+        return <ResidentsPage />;
       case "building":
-        return <div className="p-6"><h2 className="text-2xl font-bold">Informações do Edifício</h2><p className="text-muted-foreground mt-2">Dados e configurações do condomínio em desenvolvimento...</p></div>;
+        return <BuildingPage />;
       
       // Área do Síndico
       case "syndic-dashboard":
@@ -45,6 +50,14 @@ const Index = () => {
         return <FinancialManagement />;
       case "syndic-services":
         return <ServiceManagement />;
+      
+      // Área do Administrador
+      case "admin-residents":
+        return <AdminResidentsPage />;
+      case "admin-building":
+        return <div className="p-6"><h2 className="text-2xl font-bold">Gestão do Edifício</h2><p className="text-muted-foreground mt-2">Configurações avançadas do condomínio em desenvolvimento...</p></div>;
+      case "admin-system":
+        return <div className="p-6"><h2 className="text-2xl font-bold">Configurações do Sistema</h2><p className="text-muted-foreground mt-2">Configurações gerais do sistema em desenvolvimento...</p></div>;
       
       default:
         return <Dashboard />;
